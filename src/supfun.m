@@ -1,17 +1,17 @@
 # function to reduce in a monomial basis (change it using HASH?)
-MonomialDiv:=proc(m,gb)
+MonomialDiv:=proc(m,lm)
     local b:
     # return Groebner[NormalForm](b,lm,tdeg(op(vars)),characteristic=2):
     for b in gb do:
         if divide(m,b) then:
-            return 0:
+            return true:
         end if:
     end do:
-    return m:
+    return false:
 end proc:
 
 # list of coefficients of a multivariate polynomial
-mycoeffs := proc(pol,var)
+mycoeffs := proc(pol::{polynom},var::{list})
 	local deg,j:
 	deg := degree(pol,var):
 	return [seq(coeff(pol,var,deg+1-j),j=1..(deg+1))]:
@@ -30,7 +30,7 @@ mulCoeff := proc(f,m,vars)
 end:
 
 # generate a list of l different elements of GF(char) for evaluation
-GenerateData := proc(npoints,char)
+GenerateData:=proc(npoints::{list},char::{integer})
 	local xdata,roll,t,i:
 	xdata := []:
 	if char = 0 then:
@@ -57,12 +57,10 @@ GenerateData := proc(npoints,char)
 end proc:
 
 # compute a basis of the vector space K[X]/I
-QuotientBasis := proc(F,vars,params,char,ord:=tdeg(op(vars)))
-    local n,gblm,lm,q,B,b,i,checked,r:
+QuotientBasis:=proc(F::{list},vars::{list},params::{list},char::{integer},ord:=tdeg(op(vars)))
+        local n,q,B,b,v,checked,flag,m,rvars:
+    rvars:=ListTools[Reverse](vars):
     n:=nops(vars):
-    gblm:=FGb[fgb_gbasis_lm](F,char,vars,params):
-    lm:=subs([seq(params[i]=1,i=1..nops(params))],map(primpart,gblm[2])):
-    lm:=FGb[fgb_gbasis](lm,2,[],vars):
     #build all the monomials here
     q:=queue[new](1):
     B:=[]:
@@ -70,18 +68,23 @@ QuotientBasis := proc(F,vars,params,char,ord:=tdeg(op(vars)))
     while not queue[empty](q) do:
         b:=queue[dequeue](q):
         if not member(b,checked) then:
-            r:=MonomialDiv(b,lm):
-            printf("."):
             checked:=[op(checked),b]:
-            if r <> 0 then:
+            flag:=true:
+            for m in lm do:
+                if divide(b,m) then:
+                    flag:=false:
+                    break:
+                end if:
+            end do:
+            if flag then:
                 B:=[op(B),b]:
-                for i from 1 to n do:
-                    queue[enqueue](q,expand(vars[i]*b)):
+                for v in rvars do:
+                    queue[enqueue](q,v*b):
                 end do:
             end if:
         end if:
     end do:
-    B := sort(B,(a,b)->Groebner[TestOrder](a,b,ord)):
+    # B := sort(B,(a,b)->Groebner[TestOrder](a,b,ord)):
     return B:
 end proc:
 
@@ -135,7 +138,7 @@ computeMatrix := proc(m,B,gb,vars,params,char,ord:=tdeg(op(vars)))
     d:=nops(B):
     M:=Matrix(d):
     for i from 1 to d do:
-        tmp := expand(m*B[i]):
+        tmp:=m*B[i]:
         if member(primpart(tmp),B2,'j') then:
             M[i,j]:=1:
         else:
@@ -149,7 +152,7 @@ computeMatrix := proc(m,B,gb,vars,params,char,ord:=tdeg(op(vars)))
 end proc:
 
 # remove duplicated entries in the matrix
-rmvDup:=proc(B)
+rmvDup:=proc(B::{list})
     local computed,distinct_index,d,i,j,tmp,t,M:
     d:=nops(B):
     computed := B:
@@ -219,7 +222,8 @@ np_factor:=proc(np)
     return res:
 end proc:
 
-sign_variant:=proc(ll)
+# compute the number of sign changes in a list of integers
+sign_variant:=proc(ll::{list})
     local cmpt,i:
     cmpt:=0:
     for i from 1 to nops(ll)-1 do:
@@ -298,4 +302,33 @@ allMinors := proc(M,c)
         end do:
     end do:
 	return lminors:
+end proc:
+
+# every input sorted in the order ord
+allMatrices := proc(B,gb,lm,vars,params,char,ord:=tdeg(op(vars)))
+    local n,d,m,F,M,s,tmp,i,j,k,normalForms,list_NormalForms:
+    n:=nops(vars):
+    d:=nops(B):
+    F:=[seq(seq(vars[i]*B[j],i=1..n),j=1..d)]:
+    F:=sort(F):
+    normalForms:=table();
+    for m in F do:
+        if member(m,B) then:
+            normalForms[m]:=1:
+        else:
+            if member(m,lm,'j') then:
+                list_NormalForms[m]:=[seq(k=1..d)]:
+                M[i]:=Vector([seq(mulCoeff(s,B2[k],vars)/content(B[k]),k=1..d)]):
+            else:
+
+            end if:
+        end if:
+    end do:
+    for i from 1 to n do:
+        M:=Matrix(d):
+        for j from 1 to d do:
+            tmp := expand(vars[i]*B[j]):
+            normalForms[tmp]:
+        end do:
+    end do:
 end proc:

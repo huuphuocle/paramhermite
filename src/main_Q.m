@@ -168,7 +168,7 @@ naiveHermite_nodenom:=proc(F,vars,params,Q:=1)
 
     if Q <> 1 then:
         
-        # entries when Q <> 1
+        # entries when Q <> 1 (there is one inequality)
 
         NFQ := Groebner[NormalForm](Q,gb,tdeg(op(vars))):
         coeffsQ := [coeffs(NFQ,vars,'termsQ')]:
@@ -191,12 +191,13 @@ naiveHermite_nodenom:=proc(F,vars,params,Q:=1)
         end do:
     else:
 
-        # Q = 1
+        # Q = 1 (there is no inequality)
         
         Vtr1:=Vector(d):
         for i from 1 to d do:
-            Vtr1[i]:=normal(expand(LinearAlgebra[Trace](matB[i]))): 
-            H[1,i]:=numer(Vtr1[i]):
+            Vtr1[i]:=normal(expand(LinearAlgebra[Trace](matB[i]))):
+            H[1,i]:=Vtr1[i]:
+            # H[1,i]:=numer(Vtr1[i]):
         end do:
     end if:
 
@@ -208,10 +209,11 @@ naiveHermite_nodenom:=proc(F,vars,params,Q:=1)
 
     for ind in distinct_index do:
         for j from 1 to d do:
-            H[op(ind)] := H[op(ind)] + matB[ind[1]][ind[2],j]*Vtr1[j]:
+            H[op(ind)]:=H[op(ind)] + matB[ind[1]][ind[2],j]*Vtr1[j]:
             H[op(ind)]:=normal(expand(H[op(ind)])):
         end do:
-        H[op(ind)]:=normal(expand(H[op(ind)]*ldenom[ind[1]]*ldenom[ind[2]])):
+        H[op(ind)]:=normal(expand(H[op(ind)])):
+        # H[op(ind)]:=normal(expand(H[op(ind)]*ldenom[ind[1]]*ldenom[ind[2]])):
     end do:
 
     for i from 1 to d do:
@@ -222,16 +224,12 @@ naiveHermite_nodenom:=proc(F,vars,params,Q:=1)
         end do:
     end do:
     for i from 1 to d do:
-        for j from 1 to i-1 do: 
+        for j from 1 to i do:
+            H[j,i]:=normal(expand(H[j,i]*ldenom[i]*ldenom[j])):
             H[i,j] := H[j,i]:
         end do:
     end do:
 
-    # for i from 1 to d do:
-    #     for j from 1 to d do:
-    #         H[i,j]:=normal(expand(H[i,j]*ldenom[i]*ldenom[j])):
-    #     end do:
-    # end do:
     return H:
 end proc:
 

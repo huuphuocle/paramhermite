@@ -14,7 +14,8 @@ directHermite, multMatrices_modp, matrixBasis_modp, specHM_modp, liftMatrix_modp
 sign_variant,np_factor,naiveHermite_nodenom,naiveHermite_quotient,euler_candy,signPatterns,
 ppc1,ppc2,isol,classify,mipoint,
 AssumptionTest,ZeroDimReduce,
-mulCoeff, GenerateData, mInterp, mycoeffs, rmvDup,computeMatrix_quo, matrixBasis_quo, MonomialDiv, allMinors:
+mulCoeff, GenerateData, mInterp, mycoeffs, rmvDup,computeMatrix_quo, matrixBasis_quo, MonomialDiv, allMinors,
+allMatrices: #TODO: rewrite allMatrices
 
 $include "supfun.m":
 $include "main_Q.m":
