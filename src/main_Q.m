@@ -1,17 +1,31 @@
+// NonSpecializationPolynomial:=proc(F,vars,params,char)
+//     local gblm,lm,lm_red,lc,i,k:
+//     gblm:=FGb[fgb_gbasis_lm](F,char,vars,params,{"verb"=3}):
+//     lm:=map(primpart,subs([seq(params[i]=1,i=1..nops(params))],gblm[2])):
+//     lm_red:=FGb[fgb_gbasis](lm,2,[],vars):
+//     lc:=[]:
+//     lm:=ListTools[Reverse](lm):
+//     for i from 1 to nops(lm_red) do:
+//         if member(lm_red[i],lm,'k') then:
+//             lc:=[op(lc),mulCoeff(gblm[1][nops(lm)+1-k],lm[k],vars)]:
+//         end if:
+//     end do:
+//     lc:=remove(p->degree(p)=0,lc):
+//     lc:=np_factor(lc):
+//     return lc:
+// end proc:
+
 NonSpecializationPolynomial:=proc(F,vars,params,char)
-    local gblm,lm,lm_red,lc,i,k:
+    local m,gblm,lm,lm_red,lc,i,k:
     gblm:=FGb[fgb_gbasis_lm](F,char,vars,params,{"verb"=3}):
     lm:=map(primpart,subs([seq(params[i]=1,i=1..nops(params))],gblm[2])):
     lm_red:=FGb[fgb_gbasis](lm,2,[],vars):
-    lc:=[]:
-    lm:=ListTools[Reverse](lm):
-    for i from 1 to nops(lm_red) do:
-        if member(lm_red[i],lm,'k') then:
-            lc:=[op(lc),mulCoeff(gblm[1][nops(lm)+1-k],lm[k],vars)]:
+    lc:=[seq([m,[]],m in lm_red)]:
+    for i from 1 to nops(lm) do:
+        if member(lm[i],lm_red,'k') then:
+            lc[k][2]:=[op(lc[k][2]),mulCoeff(gblm[1][i],lm[i],vars)]:
         end if:
     end do:
-    lc:=remove(p->degree(p)=0,lc):
-    lc:=np_factor(lc):
     return lc:
 end proc:
 
