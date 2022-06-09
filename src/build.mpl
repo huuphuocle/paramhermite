@@ -1,5 +1,5 @@
-system("rm ../ParamHermite.mla"):
+system("rm ../lib/ParamHermite.mla"):
 read "hermite.mpl":
-LibraryTools[Create]("../ParamHermite.mla"):
-savelib('ParamHermite',"../ParamHermite.mla");
+LibraryTools[Create]("../lib/ParamHermite.mla"):
+savelib('ParamHermite',"../lib/ParamHermite.mla");
 quit;
