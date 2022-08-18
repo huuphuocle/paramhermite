@@ -5,11 +5,12 @@ RealRootClassification:=proc(F,vars,params)
 end proc:
 
 RRC_core:=proc(F,vars,params)
-    local n,lm,lmr,q,B,d,gb,multmat,matB,H,i,j,ind,Vtr1,ldenom,
+    local n,t,lm,lmr,q,B,d,gb,multmat,matB,H,i,j,ind,Vtr1,ldenom,
         distinct_index,indexMat,gblm, NFQ,coeffsQ,termsQ,matQ,
         r,k,checked,b,nonproper,ld,wH,w,sp,nrealsols,nr,formulas,Dmax:
 
     n:=nops(vars):
+    t:=nops(params):
     gblm:=FGb[fgb_gbasis_lm](F,0,vars,params):
     
     # Construct the basis of the quotient ring
@@ -94,7 +95,7 @@ RRC_core:=proc(F,vars,params)
     end if:
     wH:=CleanFactors(numer(ld[-1]),nonproper):
     w:=expand(mul(wH)*mul(nonproper)):
-    Dmax:=max(map(deg,F)):
+    Dmax:=max(map(degree,F)):
     if 4*8^t*Dmax^(4*nops(vars)*nops(t)) > 2^d then:
         sp:=SamplePoints(w,params):
         nrealsols:=[seq(NumberOfRealSolutions(sp[i],H),i=1..nops(sp))]:
@@ -107,6 +108,7 @@ RRC_core:=proc(F,vars,params)
             return [H,ld,formulas]:
 	    end if:
     else:
+        print("Using RAGlib:");
         sp:=RAG[PointsPerComponents]([seq(ld[i]<>0,i=1..nops(ld))]):
         nrealsols:=[seq(NumberOfRealSolutions(sp[i],H),i=1..nops(sp))]:
         nr:=convert(convert(nrealsols,set),list):
