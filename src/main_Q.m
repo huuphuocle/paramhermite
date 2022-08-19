@@ -360,7 +360,7 @@ end proc:
 matrixBasis := proc(multmat,B,d,vars,n)
     local matB,i,var,t1,t2:
     matB := Array(1..d):
-    matB[1] := IdentityMatrix(d):
+    matB[1] := LinearAlgebra[IdentityMatrix](d):
     for i from 2 to d do:
         var := convert(indets(B[i]),list):
         member(var[1],vars,'t1'):
